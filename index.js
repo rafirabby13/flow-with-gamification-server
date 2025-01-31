@@ -5,7 +5,7 @@ const cors = require("cors");
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
-app.use(cors());
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 
@@ -25,19 +25,27 @@ async function run() {
     const idCollection = client.db("quiz").collection("ids");
     const markCollection = client.db("quiz").collection("mark");
 
-    app.post("/ids", async (req, res) => {
+
+    app.get("/data", async (req, res) => {
+      const response = await fetch("https://api.jsonserve.com/Uw5CrX");
+      const data = await response.json();
+      // console.log(data)
+      res.send(data);
+    });
+    
+    app.post("/ids-post", async (req, res) => {
       const data = req.body;
       console.log(data)
       const result = await idCollection.insertOne(data);
       res.send(result);
     });
-    app.get("/ids", async (req, res) => {
+    app.get("/all-ids", async (req, res) => {
       const query = {};
       // console.log(data)
       const result = await idCollection.find(query).toArray();
       res.send(result);
     });
-    app.get("/marks", async (req, res) => {
+    app.get("/allmarks", async (req, res) => {
       const query = {};
       // console.log(data)
       const result = await markCollection.find(query).toArray();
@@ -56,7 +64,7 @@ async function run() {
       const result = await idCollection.deleteMany(query);
       res.send(result);
     });
-    app.delete("/marks", async (req, res) => {
+    app.delete("/delete-marks", async (req, res) => {
       const query = {};
       // console.log(data)
       const result = await markCollection.deleteMany(query);
@@ -73,12 +81,6 @@ async function run() {
 }
 run().catch(console.dir);
 
-app.get("/data", async (req, res) => {
-  const response = await fetch("https://api.jsonserve.com/Uw5CrX");
-  const data = await response.json();
-  // console.log(data)
-  res.send(data);
-});
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
