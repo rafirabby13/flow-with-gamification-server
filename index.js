@@ -11,6 +11,7 @@ app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.7ufsi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
+console.log(uri)
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -28,6 +29,10 @@ async function run() {
 
     app.get("/data", async (req, res) => {
       const response = await fetch("https://api.jsonserve.com/Uw5CrX");
+      console.log(response)
+      if (!response.ok) {
+        console.log('kuch to garbar he')
+      }
       const data = await response.json();
       // console.log(data)
       res.send(data);
@@ -43,6 +48,10 @@ async function run() {
       const query = {};
       // console.log(data)
       const result = await idCollection.find(query).toArray();
+      // console.log(result)
+      // if (!response.ok) {
+      //   console.log('kuch to garbar he')
+      // }
       res.send(result);
     });
     app.get("/allmarks", async (req, res) => {
