@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 require("dotenv").config();
 const cors = require("cors");
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
 app.use(cors({ origin: '*' }));
@@ -23,31 +23,29 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    const idCollection = client.db("quiz").collection("ids");
+    const ansCollection = client.db("quiz").collection("ans");
     const markCollection = client.db("quiz").collection("mark");
+    const quizCollection = client.db("quiz").collection("quizdata");
 
 
     app.get("/data", async (req, res) => {
-      const response = await fetch("https://api.jsonserve.com/Uw5CrX");
-      console.log(response)
-      if (!response.ok) {
-        console.log('kuch to garbar he')
-      }
-      const data = await response.json();
-      // console.log(data)
+      const data = await quizCollection.find({}).toArray()
       res.send(data);
     });
-    
-    app.post("/ids-post", async (req, res) => {
+
+    app.post("/ans", async (req, res) => {
       const data = req.body;
       console.log(data)
-      const result = await idCollection.insertOne(data);
+      if (!data) {
+        res.send({ message: false })
+      }
+      const result = await ansCollection.insertMany(data.ans);
       res.send(result);
     });
-    app.get("/all-ids", async (req, res) => {
+    app.get("/ans", async (req, res) => {
       const query = {};
       // console.log(data)
-      const result = await idCollection.find(query).toArray();
+      const result = await ansCollection.find(query).toArray();
       // console.log(result)
       // if (!response.ok) {
       //   console.log('kuch to garbar he')
@@ -70,7 +68,7 @@ async function run() {
     app.delete("/ids", async (req, res) => {
       const query = {};
       // console.log(data)
-      const result = await idCollection.deleteMany(query);
+      const result = await ansCollection.deleteMany(query);
       res.send(result);
     });
     app.delete("/delete-marks", async (req, res) => {
